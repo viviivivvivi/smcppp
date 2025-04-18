@@ -167,7 +167,7 @@ def main():
         st.subheader("Camera")
         camera_source = st.selectbox(
             "Camera Source", 
-            ["0", "1", "2", "rtsp://example.com/stream"], 
+            ["0", "1", "2", "rtsp://username:password@ip_address:554/live_stream0.sdp"], 
             index=1
         )
         
