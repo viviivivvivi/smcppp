@@ -251,7 +251,7 @@ def main():
         alerts = st.session_state.client.get_alerts()
         
         if st.session_state.camera_status:
-            video_placeholder.image(frame, channels="RGB", use_column_width=True)
+            video_placeholder.image(frame, channels="RGB", use_container_width=True)
         else:
             video_placeholder.warning("Camera is currently disabled")
         
