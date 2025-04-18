@@ -154,7 +154,8 @@ def main():
         api_url = st.text_input("API URL", "http://127.0.0.1:8000")
         
         col1= st.columns(1)
-        connect_button = st.button("Connect")
+        with col1:
+            connect_button = st.button("Connect")
    
         
         if connect_button:
