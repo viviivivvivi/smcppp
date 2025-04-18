@@ -154,8 +154,8 @@ def main():
         api_url = st.text_input("API URL", "http://127.0.0.1:8000")
         
         col1= st.columns(1)
-        with col1:
-            connect_button = st.button("Connect")
+        
+        connect_button = st.button("Connect")
    
         
         if connect_button:
@@ -168,7 +168,7 @@ def main():
         st.subheader("Camera")
         camera_source = st.selectbox(
             "Camera Source", 
-            ["0", "1", "2", "rtsp://username:password@ip_address:554/live_stream0.sdp"], 
+            ["0", "1", "2"], 
             index=1
         )
         
