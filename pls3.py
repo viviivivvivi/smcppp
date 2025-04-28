@@ -172,7 +172,9 @@ class CombinedSystem:
         self.ubidots_service = UbidotsService("BBUS-5QUctLYAhVGEfAQxGrSSM9Zciv4g0m")
         self.alert_history = []
         self.latest_frame = None
-        self.cap=cv2.VideoCapture(1)
+        max_index=5
+        for index in range(max_index):
+            self.cap = cv2.VideoCapture(index)
 
 
         
@@ -183,6 +185,8 @@ class CombinedSystem:
             "weapon": 0,
             "normal": 0
         }
+
+   
 
     def _load_lstm_model(self, lstm_model_path):
         try:

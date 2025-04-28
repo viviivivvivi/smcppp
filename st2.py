@@ -15,7 +15,7 @@ from pls3 import CombinedSystem, AlertService
 
 
 class SecuritySystemClient:
-    def __init__(self, api_url="http://127.0.0.1:8000"):
+    def __init__(self, api_url="http://125.166.63.182:8000"):
         self.api_url = api_url
         self.connected = False
         self.detection_history = {
@@ -96,7 +96,7 @@ class SecuritySystemClient:
             return False
 
     def sound_detection(self,sound_value,message ):
-        response = requests.get(f"{self.api_url}/sound_detected", params={"type": sound_value, "message": message}, timeout=3)  # Timeout increased to 3 seconds
+        response = requests.get(f"{self.api_url}/sound_detected", params={"type": sound_value, "message": message}, timeout=3)  
         if response.status_code == 200:
 
             response_data = response.json()
@@ -151,7 +151,7 @@ def main():
         
         # Connection settings
         st.subheader("Connection")
-        api_url = st.text_input("API URL", "http://127.0.0.1:8000")
+        api_url = st.text_input("API URL", "http://125.166.63.182:8000")
         
         col1= st.columns(1)
         
