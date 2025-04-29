@@ -15,7 +15,7 @@ from pls3 import CombinedSystem, AlertService
 
 
 class SecuritySystemClient:
-    def __init__(self, api_url="https://99c2-125-166-63-182.ngrok-free.app"):
+    def __init__(self, api_url="https://gc1f9zqh-8000.asse.devtunnels.ms/"):
         self.api_url = api_url
         self.connected = False
         self.detection_history = {
@@ -151,7 +151,7 @@ def main():
         
         # Connection settings
         st.subheader("Connection")
-        api_url = st.text_input("API URL", "https://99c2-125-166-63-182.ngrok-free.app")
+        api_url = st.text_input("API URL", "https://gc1f9zqh-8000.asse.devtunnels.ms/")
     
 
         col1= st.columns(1)
