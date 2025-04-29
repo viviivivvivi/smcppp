@@ -164,9 +164,9 @@ def main():
             if st.session_state.client.connect():
                 st.success("Connected successfully!")
             else :
-                st.error("rachel masi laper rawr")
+                st.error("Unable to connect!")
         else :
-            st.error("oke")
+            st.warning("Please click the Connet Button!")
         
         # Camera settings
         st.subheader("Camera")
