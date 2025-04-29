@@ -152,7 +152,8 @@ def main():
         # Connection settings
         st.subheader("Connection")
         api_url = st.text_input("API URL", "http://192.168.100.155:8000")
-        
+        # api_url = "http://192.168.100.155:8000"
+
         col1= st.columns(1)
         
         connect_button = st.button("Connect")
@@ -162,7 +163,10 @@ def main():
             st.session_state.client = SecuritySystemClient(api_url)
             if st.session_state.client.connect():
                 st.success("Connected successfully!")
-
+            else :
+                st.error("rachel masi laper rawr")
+        else :
+            st.error("oke")
         
         # Camera settings
         st.subheader("Camera")
