@@ -251,7 +251,7 @@ def main():
    
         frame = st.session_state.client.get_frame()
         if frame is None:
-            video_placeholder.warning("No video frame available from backend")
+            video_placeholder.error("No video frame available from backend")
             time.sleep(0.1)
             continue
 
