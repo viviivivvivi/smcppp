@@ -15,7 +15,7 @@ from pls3 import CombinedSystem, AlertService
 
 
 class SecuritySystemClient:
-    def __init__(self, api_url=" https://0d9d-36-84-83-225.ngrok-free.app "):
+    def __init__(self, api_url="https://5345-36-84-83-225.ngrok-free.app"):
         self.api_url = api_url
         self.connected = False
         self.detection_history = {
@@ -151,7 +151,7 @@ def main():
         
         # Connection settings
         st.subheader("Connection")
-        api_url = st.text_input("API URL", " https://0d9d-36-84-83-225.ngrok-free.app ")
+        api_url = st.text_input("API URL", "")
         
         col1= st.columns(1)
         
@@ -251,7 +251,7 @@ def main():
         frame = st.session_state.client.get_frame()
         if frame is None:
             st.error("frame not available")
-            
+
         stats = st.session_state.client.get_stats()
         alerts = st.session_state.client.get_alerts()
         
