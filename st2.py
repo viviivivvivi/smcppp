@@ -250,7 +250,8 @@ def main():
    
         frame = st.session_state.client.get_frame()
         if frame is None:
-            frame = generate_frame() 
+            st.error("frame not available")
+            
         stats = st.session_state.client.get_stats()
         alerts = st.session_state.client.get_alerts()
         
