@@ -9,9 +9,9 @@ import requests
 import threading
 import time
 from datetime import datetime
-from twilio.rest import Client
 import json
 from flask_cors import CORS
+from waitress import serve
 
 class PersonDetector:
     def __init__(self):
@@ -115,15 +115,9 @@ class AlertService:
     def __init__(self):
         self.last_alert_time = 0
         self.alert_cooldown = 30  
-        self.twilio_enabled = False #still false and may be opened if we get to stage 4 :)
         self.esp32_enabled = True
         self.esp32_ip = "192.168.100.77"
         
-        #Twilio
-        self.twilio_sid = "oAC050bc8d5b85372bb9a6178bfd7f24d52"
-        self.twilio_token = "3fc8f71e039cfbf04cf0ae68faca5101"
-        self.twilio_from = "+19786969043"
-        self.twilio_to = "+628112444595"
  
     def send_alert(self, alert_type, details=""):
         current_time = time.time()
@@ -139,8 +133,6 @@ class AlertService:
         if self.esp32_enabled and alert_type in ["violence", "weapon"]:
             self._send_to_esp32(alert_type)
             
-        if self.twilio_enabled and alert_type in ["violence", "weapon", "high_sound_violence", "high_sound_suspicious"]:
-            self._send_to_twilio(message)
             
         return True
 
@@ -150,15 +142,6 @@ class AlertService:
             print(f"ESP32 alert sent: {alert_type}")
         except requests.exceptions.RequestException as e:
             print(f"Failed to alert ESP32: {e}")
-
-    def _send_to_twilio(self, message):
-        try:
-            client = Client(self.twilio_sid, self.twilio_token)
-            client.messages.create(body=message, from_=self.twilio_from, to=self.twilio_to)
-            print(f"Twilio message sent: {message}")
-        except Exception as e:
-            print(f"Failed to send Twilio message: {e}")
-
 
 class CombinedSystem:
     def __init__(self, standard_model_path, custom_model_path, lstm_model_path):
@@ -172,11 +155,7 @@ class CombinedSystem:
         self.ubidots_service = UbidotsService("BBUS-5QUctLYAhVGEfAQxGrSSM9Zciv4g0m")
         self.alert_history = []
         self.latest_frame = None
-        max_index=5
-        for index in range(max_index):
-            self.cap = cv2.VideoCapture(index)
-
-
+        self.cap = cv2.VideoCapture(0)
         
         # Detection history 
         self.detection_history = {
@@ -185,8 +164,6 @@ class CombinedSystem:
             "weapon": 0,
             "normal": 0
         }
-
-   
 
     def _load_lstm_model(self, lstm_model_path):
         try:
@@ -207,16 +184,11 @@ class CombinedSystem:
             if not ret:
                 continue
 
-       
-            result_frame, action_label, activities= self.process_frame(frame)  
-
+            result_frame, action_label, activities = self.process_frame(frame)
             self.latest_frame = result_frame
-
-   
 
     def start_update_loop(self):
         threading.Thread(target=self.update_loop, daemon=True).start()
-
 
     def process_frame(self, frame):
         people_boxes, activities = self.detector.process_frame(frame)
@@ -302,7 +274,7 @@ class CombinedSystem:
         
         return result
 
-    
+
 class UbidotsService:
     def __init__(self, token):
         self.token = token
@@ -366,6 +338,7 @@ class UbidotsService:
             return False
 
 
+
 class FlaskServer:
     def __init__(self, system):
         self.app = Flask(__name__)
@@ -401,49 +374,44 @@ class FlaskServer:
 
         @self.app.route('/frame')
         def get_frame():
-            success, encoded_frame = cv2.imencode('.jpg', system.latest_frame)
-            return Response(encoded_frame.tobytes(), mimetype='image/jpeg')
+            if self.system.latest_frame is not None:
+                success, encoded_frame = cv2.imencode('.jpg', self.system.latest_frame)
+                if success:
+                    return Response(encoded_frame.tobytes(), mimetype='image/jpeg')
 
         @self.app.route('/stats')
         def get_stats():
-            return jsonify(system.detection_history), 200
+            return jsonify(self.system.detection_history), 200
 
         @self.app.route('/alerts')
         def get_alerts():
-            return jsonify(system.alert_history), 200
+            return jsonify(self.system.alert_history), 200
     
     def update_action_label(self, action_label):
         self.current_action_label = action_label
 
     def run(self):
-        threading.Thread(target=lambda: self.app.run(host='0.0.0.0', port=8000, debug=False)).start()
+        threading.Thread(target=lambda: serve(self.app, host='0.0.0.0', port=8000), daemon=True).start()
+
 
 def main():
-    standard_model_path = "yolov8n.pt"
-    custom_model_path = "best.pt"
-    lstm_model_path = "best_lstm_model.h5"
-   
-
+    standard_model_path = r"C:\Users\Acer\OneDrive\Attachments\mediapipe_env\yolov8n.pt"
+    custom_model_path = r"C:\Users\Acer\OneDrive\Attachments\mediapipe_env\best.pt"
+    lstm_model_path = r"C:\Users\Acer\OneDrive\Attachments\mediapipe_env\best_lstm_model.h5"
 
     system = CombinedSystem(standard_model_path, custom_model_path, lstm_model_path)
     system.start_update_loop()
         
     server = FlaskServer(system)
     server.run()
-        
-    cap = cv2.VideoCapture(1)
-        
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-           break
-        result_frame, action_label, _ = system.process_frame(frame)
-        cv2.imshow("Activity Recognition", result_frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    
 
-    cap.release()
-    cv2.destroyAllWindows()
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("Shutting down...")
+
 
 if __name__ == "__main__":
     main()

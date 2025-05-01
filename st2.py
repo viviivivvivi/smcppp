@@ -15,7 +15,7 @@ from pls3 import CombinedSystem, AlertService
 
 
 class SecuritySystemClient:
-    def __init__(self, api_url="http://192.168.100.155:8000"):
+    def __init__(self, api_url="https://0d9d-36-84-83-225.ngrok-free.app"):
         self.api_url = api_url
         self.connected = False
         self.detection_history = {
@@ -45,7 +45,7 @@ class SecuritySystemClient:
             response = requests.get(f"{self.api_url}/frame", timeout=1)
             if response.status_code == 200:
                 img = Image.open(io.BytesIO(response.content))
-                return np.array(img)
+                return img
             return None
         except:
             return None
@@ -151,8 +151,8 @@ def main():
         
         # Connection settings
         st.subheader("Connection")
-        api_url = st.text_input("API URL", "http://192.168.100.155:8000")
-        # api_url = "http://192.168.100.155:8000"
+        api_url = st.text_input("API URL", "https://0d9d-36-84-83-225.ngrok-free.app")
+
 
         col1= st.columns(1)
         
@@ -251,7 +251,8 @@ def main():
    
         frame = st.session_state.client.get_frame()
         if frame is None:
-            frame = generate_frame() 
+            st.error("frame is none")
+            break
         stats = st.session_state.client.get_stats()
         alerts = st.session_state.client.get_alerts()
         
